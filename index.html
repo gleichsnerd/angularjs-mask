@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>AngularJS' Mask</title>
+    <meta
+      name="description"
+      content="AngularJS is not long for this world, so let's commemorate it, like most things in life, with a meme."
+    />
+    <meta name="author" content="gleichsnerd" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <style>
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        background-color: black;
+        font-family: "Arial Narrow", Arial;
+        font-weight: bold;
+        color: white;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      div {
+        text-align: center;
+      }
+
+      .dawn-of {
+        font-size: 3.9rem;
+      }
+
+      .passed {
+        font-size: 5.9rem;
+      }
+
+      .remain {
+        font-size: 2.25rem;
+        cursor: pointer;
+      }
+    </style>
+    <script>
+      MINUTE_MS_MULTIPLIER = 60 * 1000;
+      DEFAULT_DELAY = 60 * MINUTE_MS_MULTIPLIER;
+      ANNOUNCEMENT = moment(1530403200000);
+      EOL = moment(1625097599000);
+
+      var printRemainingTimeInDays = false;
+
+      function suffixAdder(num) {
+        var n = "" + num;
+        var suffix = "th";
+        var lastDigit = n.charAt(n.length - 1);
+
+        if (lastDigit === "1") {
+          suffix = "st";
+        } else if (lastDigit === "2") {
+          suffix = "nd";
+        }
+
+        return n + suffix;
+      }
+
+      function freshenMeme(now) {
+        document.getElementById("time-passed").innerText = suffixAdder(
+          Math.floor(now.diff(ANNOUNCEMENT, "days"))
+        );
+        if (printRemainingTimeInDays) {
+          document.getElementById("time-remaining").innerText =
+            Math.ceil(EOL.diff(now, "days")) + " Days";
+        } else {
+          document.getElementById("time-remaining").innerText =
+            Math.ceil(EOL.diff(now, "hours")) + " Hours";
+        }
+      }
+
+      var memeInterval = null;
+      function startInterval(delay) {
+        return setInterval(function() {
+          var now = moment();
+          freshenMeme(now);
+
+          if (delay < DEFAULT_DELAY) {
+            clearInterval(memeInterval);
+            memeInterval = startInterval(DEFAULT_DELAY);
+          }
+        }, delay);
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="dawn-of">Dawn of</div>
+    <div class="passed">The <span id="time-passed"></span> Day</div>
+    <div id="time-remaining-wrapper" class="remain">
+      &#8259;<span id="time-remaining"></span> Remain&#8259;
+    </div>
+    <script>
+      var now = moment();
+      freshenMeme(now);
+      memeInterval = startInterval(
+        (delay = (60 - now.minutes()) * MINUTE_MS_MULTIPLIER)
+      );
+
+      document
+        .getElementById("time-remaining-wrapper")
+        .addEventListener("click", function() {
+          printRemainingTimeInDays = !printRemainingTimeInDays;
+          freshenMeme(moment());
+        });
+    </script>
+  </body>
+</html>
